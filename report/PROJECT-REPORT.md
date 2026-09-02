@@ -48,6 +48,8 @@ discharging cells. Confirmed via Serial Monitor output that:
 - Adaptive threshold shifted from 0.030V to 0.050V as average SoC increased
 - Warning correctly triggers whenever imbalance exceeds the current threshold
 
+![Task 1 Serial Output](Task1.png)
+
 ### Scalability Analysis (4 → 16 cells)
 **Memory:** All cell data is stored in arrays sized by `NUM_CELLS`. Each
 array element is a 4-byte float, so even at 16 cells, total memory usage
