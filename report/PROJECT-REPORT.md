@@ -123,7 +123,34 @@ above the trip threshold. Confirmed via Serial Monitor that:
   without missing transitions or requiring a reset
 
 ## Task 3: Flicker-Free LCD Display Engine
-*Pending*
+### Objective
+Create an LCD rendering engine that updates only the screen positions
+whose values have changed, avoiding full-screen clears and visible
+flicker, while automatically rotating between multiple information
+pages and immediately overriding to a fault screen during critical
+faults.
+
+### Design Overview
+- **No full clears during normal operation:** The display is never
+  cleared during routine updates. Instead, `lcd.setCursor()` targets
+  the exact row/column of a value before overwriting it, so only
+  changed characters are redrawn — eliminating flicker.
+- **Non-blocking page rotation:** Uses the same `millis()`-based timer
+  pattern as Task 2's state machine to automatically cycle between at
+  least three pages (battery status, system state, telemetry) on a
+  fixed interval, without blocking the rest of the program.
+- **Fault override:** When the relay state machine (Task 2) reports a
+  `TRIPPED` state, the LCD immediately switches to a dedicated fault
+  screen, overriding normal page rotation, and holds it until the
+  fault clears.
+- **Refresh interval justification:** A ~300ms value-refresh interval
+  and ~3 second page-rotation interval were selected based on
+  character LCD physical response limits (~100–200ms minimum) and the
+  fact that faster updates offer no readability benefit to a human
+  observer while wasting CPU cycles.
+  
+### Verification
+*(to be completed after implementation and testing)*
 
 ## Task 4: Fault State Machine with Structured Recovery
 *Pending*
