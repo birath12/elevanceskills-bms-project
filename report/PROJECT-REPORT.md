@@ -9,12 +9,12 @@
 
 ## Table of Contents
 1. [Task 1: Modular Battery Management Engine](#task-1-modular-battery-management-engine) — ✅ Completed
-2. Task 2: Non-Blocking Protection Relay and Safety System — ✅ Completed
-3. Task 3: Flicker-Free LCD Display Engine — 🚧 Pending
-4. Task 4: Fault State Machine with Structured Recovery — 🚧 Pending
-5. Task 5: Event-Driven Telemetry and Live Blynk Dashboard — 🚧 Pending
-6. Task 6: Enterprise Blynk Analytics and Decision Dashboard — 🚧 Pending
-
+2. [Task 2: Non-Blocking Protection Relay and Safety System](#task-2-non-blocking-protection-relay-and-safety-system) — ✅ Completed
+3. [Task 3: Flicker-Free LCD Display Engine](#task-3-flicker-free-lcd-display-engine) — 🚧 Pending
+4. [Task 4: Fault State Machine with Structured Recovery](#task-4-fault-state-machine-with-structured-recovery) — 🚧 Pending
+5. [Task 5: Event-Driven Telemetry and Live Blynk Dashboard](#task-5-event-driven-telemetry-and-live-blynk-dashboard) — 🚧 Pending
+6. [Task 6: Enterprise Blynk Analytics and Decision Dashboard](#task-6-enterprise-blynk-analytics-and-decision-dashboard) — 🚧 Pending
+   
 ---
 
 ## Task 1: Modular Battery Management Engine
