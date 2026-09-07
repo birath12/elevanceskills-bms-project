@@ -121,6 +121,8 @@ above the trip threshold. Confirmed via Serial Monitor that:
   satisfying the structured logging requirement
 - The system remained stable under repeated, rapid fault triggering
   without missing transitions or requiring a reset
+  
+![Task 2 Serial Output](Task2.png)
 
 ## Task 3: Flicker-Free LCD Display Engine
 ### Objective
