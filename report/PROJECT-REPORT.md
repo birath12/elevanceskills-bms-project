@@ -9,7 +9,7 @@
 
 ## Table of Contents
 1. [Task 1: Modular Battery Management Engine](#task-1-modular-battery-management-engine) — ✅ Completed
-2. Task 2: Non-Blocking Protection Relay and Safety System — 🚧 Pending
+2. Task 2: Non-Blocking Protection Relay and Safety System — ✅ Completed
 3. Task 3: Flicker-Free LCD Display Engine — 🚧 Pending
 4. Task 4: Fault State Machine with Structured Recovery — 🚧 Pending
 5. Task 5: Event-Driven Telemetry and Live Blynk Dashboard — 🚧 Pending
@@ -72,7 +72,55 @@ production BMS ICs (e.g., TI BQ76952) handle configurable cell counts.
 ---
 
 ## Task 2: Non-Blocking Protection Relay and Safety System
-*Pending*
+
+### Objective
+Develop a fully non-blocking safety system that protects the battery pack
+by tripping a relay when dangerous conditions are detected, while avoiding
+false trips from noise, and following a controlled, timed recovery process.
+
+### Design Overview
+- **Non-blocking timing:** Uses `millis()` throughout instead of `delay()`,
+  so the relay state machine keeps running and checking conditions on
+  every loop iteration without ever freezing the program.
+- **Hysteresis:** Two separate thresholds prevent chattering — the relay
+  trips when imbalance exceeds `0.15V`, but only resets once imbalance
+  drops below `0.10V`. This gap prevents rapid on/off switching when
+  imbalance hovers near a single value.
+- **Debounce:** A detected fault must persist for at least `50ms`
+  (`DEBOUNCE_MS`) before the relay actually trips, filtering out
+  momentary electrical noise from being mistaken for a real fault.
+- **Sensor anomaly detection:** Each cell's readings are checked every
+  loop for:
+  - *Frozen readings* — identical value repeated more than 5 times in a row
+  - *Unrealistic jumps* — voltage change greater than 0.5V between two
+    consecutive readings (physically impossible for a real cell)
+  - *Out-of-range values* — voltage outside the valid 2.5V–4.3V window
+- **Relay state machine:** Implemented with an enum
+  (`NORMAL → FAULT_PENDING → TRIPPED → RECOVERING → NORMAL`), where every
+  transition is logged with a clear before/after state description.
+- **Timed recovery:** After a fault clears, the system does not
+  immediately return to NORMAL. It enters a `RECOVERING` state and must
+  observe 5 continuous seconds (`RECOVERY_MS`) of clean, in-threshold
+  readings before fully resuming normal operation. Any fault recurrence
+  during this window sends it back to `TRIPPED`.
+- **Relay output:** Simulated using an LED wired to GPIO25 — LED ON
+  represents the relay tripped (power cut), LED OFF represents normal
+  operation.
+
+### Verification
+Tested in Wokwi by rapidly adjusting potentiometers to create imbalance
+above the trip threshold. Confirmed via Serial Monitor that:
+- The system correctly transitions through
+  `NORMAL → FAULT_PENDING → TRIPPED` when imbalance persists past the
+  debounce window
+- The LED turns on exactly when the relay state reaches `TRIPPED`
+- Reducing imbalance below the reset threshold moves the system into
+  `RECOVERING`, and it only returns to `NORMAL` (LED off) after the full
+  5-second timed recovery period with no repeated faults
+- All state transitions are printed with clear before/after labels,
+  satisfying the structured logging requirement
+- The system remained stable under repeated, rapid fault triggering
+  without missing transitions or requiring a reset
 
 ## Task 3: Flicker-Free LCD Display Engine
 *Pending*
