@@ -155,10 +155,61 @@ faults.
 *(to be completed after implementation and testing)*
 
 ## Task 4: Fault State Machine with Structured Recovery
-*Pending*
+
+### Objective
+Implement a deterministic state machine with four operating states —
+NORMAL, DEGRADED, FAILSAFE, and SHUTDOWN — using an enum and a clearly
+defined transition table. The system must isolate faults by
+identifying their source (battery cells, relay, communication, or ADC
+failures), detect frozen ADC values and relay mismatches, log every
+state transition with a timestamp, previous state, new state, and
+fault ID, and follow a verification process before recovering from
+FAILSAFE rather than immediately returning to normal.
+
+### Design Overview
+*(to be completed during implementation)*
+
+### Verification
+*(to be completed after implementation and testing)*
 
 ## Task 5: Event-Driven Telemetry and Live Blynk Dashboard
-*Pending*
+
+### Objective
+Develop an event-driven telemetry system that transmits data only when
+meaningful events or significant parameter changes occur, rather than
+continuously streaming. When Wi-Fi or Blynk connectivity is lost,
+telemetry events must be stored in a fixed-size offline queue and
+transmitted in the correct order once the connection is restored.
+Wi-Fi reconnection must use a non-blocking state machine, and RSSI
+should be monitored to assess communication quality. The live Blynk
+dashboard must display real-time cell voltages, weakest and strongest
+cells, relay status, fault state, Wi-Fi health, and offline queue
+depth, allowing operators to distinguish between live and queued data.
+
+### Design Overview
+*(to be completed during implementation)*
+
+### Verification
+*(to be completed after implementation and testing, including fault
+injection and network outage scenarios)*
 
 ## Task 6: Enterprise Blynk Analytics and Decision Dashboard
-*Pending*
+
+### Objective
+Build an advanced Blynk analytics dashboard that provides historical
+trends, calculated risk analysis, structured fault history, and
+intelligent operator recommendations based on battery health. The
+dashboard must display time-series graphs, compute a composite risk
+score using factors such as imbalance trends, fault frequency, and
+SoC, and present human-readable maintenance suggestions generated from
+live system data. Severity levels must be visualized using colors or
+icons matching the Task 4 state machine, and an executive summary must
+present overall battery health, uptime, fault count, and current
+operating state, accurately reflecting every backend state transition
+throughout the demonstration.
+
+### Design Overview
+*(to be completed during implementation)*
+
+### Verification
+*(to be completed after implementation and testing)*
