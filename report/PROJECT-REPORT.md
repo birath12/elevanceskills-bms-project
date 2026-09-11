@@ -11,7 +11,7 @@
 1. [Task 1: Modular Battery Management Engine](#task-1-modular-battery-management-engine) — ✅ Completed
 2. [Task 2: Non-Blocking Protection Relay and Safety System](#task-2-non-blocking-protection-relay-and-safety-system) — ✅ Completed
 3. [Task 3: Flicker-Free LCD Display Engine](#task-3-flicker-free-lcd-display-engine) — ✅ Completed
-4. [Task 4: Fault State Machine with Structured Recovery](#task-4-fault-state-machine-with-structured-recovery) — 🚧 Pending
+4. [Task 4: Fault State Machine with Structured Recovery](#task-4-fault-state-machine-with-structured-recovery) — ✅ Completed
 5. [Task 5: Event-Driven Telemetry and Live Blynk Dashboard](#task-5-event-driven-telemetry-and-live-blynk-dashboard) — 🚧 Pending
 6. [Task 6: Enterprise Blynk Analytics and Decision Dashboard](#task-6-enterprise-blynk-analytics-and-decision-dashboard) — 🚧 Pending
    
@@ -182,10 +182,56 @@ fault ID, and follow a verification process before recovering from
 FAILSAFE rather than immediately returning to normal.
 
 ### Design Overview
-*(to be completed during implementation)*
+
+- **Four-state model:** Implemented via `enum FaultState { FS_NORMAL,
+  FS_DEGRADED, FS_FAILSAFE, FS_SHUTDOWN }`, layered on top of the
+  existing relay state machine (Task 2) rather than duplicating its
+  logic — NORMAL/DEGRADED/FAILSAFE map directly onto the relay's
+  NORMAL/FAULT_PENDING/TRIPPED states.
+- **Fault source isolation:** A separate `enum FaultSource { FAULT_NONE,
+  FAULT_BATTERY, FAULT_ADC, FAULT_RELAY, FAULT_COMM }` tags *why* the
+  system left NORMAL — battery imbalance, a frozen/anomalous ADC
+  reading, a simulated relay mismatch, or a simulated communication
+  fault — and this source is preserved throughout the fault duration.
+- **Simulated relay/comm faults:** A push button (GPIO26) manually
+  triggers a 3-second simulated COMM or RELAY fault (alternating each
+  press), allowing all four fault sources to be demonstrated on
+  command, since real relay feedback and real communication hardware
+  are introduced later (Task 5).
+- **Structured logging:** Every fault-state transition is logged with
+  a timestamp (`millis()`), the previous state, the new state, and the
+  fault source, in a consistent, parseable format.
+- **Verification before recovery:** After the underlying relay reaches
+  NORMAL, the fault state machine does not immediately drop out of
+  FAILSAFE — it holds for an additional 2-second verification window
+  of continued clean, anomaly-free readings before formally
+  transitioning to NORMAL, adding a deliberate double-check layer.
+- **Flap detection and SHUTDOWN escalation:** If the system enters
+  FAILSAFE three times within a 30-second window, it escalates to
+  SHUTDOWN — a terminal state that does not attempt automatic recovery,
+  preventing endless fault/recovery cycling ("flapping"). SHUTDOWN can
+  only be exited via a deliberate 3-second button hold, simulating
+  manual technician intervention.
 
 ### Verification
-*(to be completed after implementation and testing)*
+Tested in Wokwi by creating a frozen-sensor condition (leaving all
+potentiometers untouched). Confirmed via Serial log and LCD that:
+- The system correctly entered FAILSAFE with **Source: ADC** rather
+  than BATTERY — confirming fault source isolation correctly
+  distinguishes a frozen-sensor condition from a genuine imbalance
+  event, even though both can trigger the same relay TRIPPED state
+- The LCD fault screen and Serial log stayed consistent with each
+  other, confirming Task 3 and Task 4 integrate correctly
+- State transitions were logged with timestamp, previous state, new
+  state, and fault source in the expected structured format
+
+**Note/limitation:** The button-triggered simulated COMM/RELAY faults
+and the SHUTDOWN escalation path (3 FAILSAFE entries within 30s) are
+implemented and logically verified through code review, but were not
+exhaustively exercised in this testing pass. These paths will be
+demonstrated live in the final demo video.
+
+
 
 ## Task 5: Event-Driven Telemetry and Live Blynk Dashboard
 
