@@ -12,7 +12,7 @@
 2. [Task 2: Non-Blocking Protection Relay and Safety System](#task-2-non-blocking-protection-relay-and-safety-system) — ✅ Completed
 3. [Task 3: Flicker-Free LCD Display Engine](#task-3-flicker-free-lcd-display-engine) — ✅ Completed
 4. [Task 4: Fault State Machine with Structured Recovery](#task-4-fault-state-machine-with-structured-recovery) — ✅ Completed
-5. [Task 5: Event-Driven Telemetry and Live Blynk Dashboard](#task-5-event-driven-telemetry-and-live-blynk-dashboard) — 🚧 Pending
+5. [Task 5: Event-Driven Telemetry and Live Blynk Dashboard](#task-5-event-driven-telemetry-and-live-blynk-dashboard) — ✅ Completed
 6. [Task 6: Enterprise Blynk Analytics and Decision Dashboard](#task-6-enterprise-blynk-analytics-and-decision-dashboard) — 🚧 Pending
    
 ---
@@ -248,11 +248,60 @@ cells, relay status, fault state, Wi-Fi health, and offline queue
 depth, allowing operators to distinguish between live and queued data.
 
 ### Design Overview
-*(to be completed during implementation)*
+### Design Overview
+- **Non-blocking WiFi state machine:** Implemented via
+  `enum WifiState { WIFI_DISCONNECTED, WIFI_CONNECTING, WIFI_CONNECTED_STATE }`,
+  using `millis()`-based timeouts for both the connection attempt and
+  retry interval, so the rest of the system never freezes while WiFi
+  connects or reconnects.
+- **Event-driven telemetry:** Each tracked value (cell voltages,
+  weakest/strongest cell, imbalance, relay status, fault state, RSSI,
+  queue depth) is only transmitted to Blynk when it changes
+  meaningfully from the last transmitted value — not on a fixed timer
+  — minimizing unnecessary network traffic.
+- **Offline queue:** A fixed-size (20-slot) circular buffer stores
+  telemetry events when Blynk isn't reachable. If the queue fills, the
+  oldest entry is dropped to make room for new data. Once reconnected,
+  exactly one queued event is sent per loop iteration
+  (`flushOneQueuedEvent()`), preserving original order without
+  blocking other system logic.
+- **Blynk dashboard:** A live web dashboard was built with 8
+  datastreams (V0–V7) covering all required data points: cell
+  voltages, weakest/strongest cell, imbalance, relay status, fault
+  state, WiFi RSSI, and offline queue depth.
+- **Deliberate blocking exception:** `Blynk.connect(1000)` briefly
+  blocks (up to 1 second) only once, during the very first successful
+  WiFi connection, to establish the initial Blynk handshake. All
+  subsequent communication is fully non-blocking via `Blynk.run()`.
 
 ### Verification
-*(to be completed after implementation and testing, including fault
-injection and network outage scenarios)*
+Tested in Wokwi using the built-in "Wokwi-GUEST" virtual WiFi network.
+Confirmed via Serial log and the live Blynk web dashboard that:
+- The ESP32 successfully connects to WiFi and Blynk, with the device
+  showing "Online" status on the dashboard
+- Cell voltages, weakest/strongest cell, imbalance, relay status, and
+  fault state (including source, e.g. "FAILSAFE-ADC") displayed on the
+  Blynk dashboard matched the values shown on the LCD and Serial
+  Monitor at the same moment, confirming consistent state across all
+  integrated subsystems
+- Event-driven sending was observed working — values only updated on
+  the dashboard when they actually changed, and a brief non-zero
+  Queue Depth was observed in the Serial log during a transmission
+  cycle
+
+**Noted limitations:**
+- WiFi RSSI consistently reads 0, as Wokwi's simulated "Wokwi-GUEST"
+  network does not provide realistic signal strength data — a
+  constraint of the simulation environment rather than the code logic.
+- A full offline/reconnect cycle (deliberately breaking the WiFi
+  connection to observe the queue filling and later draining) was not
+  exhaustively demonstrated in this testing pass, though the queuing
+  and flush logic is implemented and was verified through code review.
+  This will be demonstrated live in the final demo video.
+
+![Task 5 Blynk Dashboard](Task5_1.png)
+
+![Task 5 Wokwi Serial Output](Task5_2.png)
 
 ## Task 6: Enterprise Blynk Analytics and Decision Dashboard
 
