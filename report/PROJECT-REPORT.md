@@ -166,6 +166,8 @@ Confirmed via observation that:
   state (Task 2's timed recovery), only returning to normal page
   rotation once the relay state machine fully resets to NORMAL —
   confirming the two systems (LCD and relay) integrate consistently
+  
+![Task 3 Serial Output](Task3.png)
 
 ## Task 4: Fault State Machine with Structured Recovery
 
