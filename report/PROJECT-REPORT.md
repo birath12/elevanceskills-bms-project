@@ -231,7 +231,7 @@ implemented and logically verified through code review, but were not
 exhaustively exercised in this testing pass. These paths will be
 demonstrated live in the final demo video.
 
-
+![Task 4 Serial Output](Task4.png)
 
 ## Task 5: Event-Driven Telemetry and Live Blynk Dashboard
 
