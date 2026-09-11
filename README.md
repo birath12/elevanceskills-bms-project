@@ -118,6 +118,9 @@ the full project report:
   escalation path were implemented and logically verified but not
   exhaustively live-demonstrated in testing, due to Wokwi build server
   congestion — these will be shown in the final demo video
+
+  ## Live Wokwi Project' heading
+  https://wokwi.com/projects/474043483466085377
 - **Blynk** — live cloud dashboard (Tasks 5–6)
 
 
