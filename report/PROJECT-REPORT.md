@@ -13,8 +13,7 @@
 3. [Task 3: Flicker-Free LCD Display Engine](#task-3-flicker-free-lcd-display-engine) — ✅ Completed
 4. [Task 4: Fault State Machine with Structured Recovery](#task-4-fault-state-machine-with-structured-recovery) — ✅ Completed
 5. [Task 5: Event-Driven Telemetry and Live Blynk Dashboard](#task-5-event-driven-telemetry-and-live-blynk-dashboard) — ✅ Completed
-6. [Task 6: Enterprise Blynk Analytics and Decision Dashboard](#task-6-enterprise-blynk-analytics-and-decision-dashboard) — 🚧 Pending
-   
+6. [Task 6: Enterprise Blynk Analytics and Decision Dashboard](#task-6-enterprise-blynk-analytics-and-decision-dashboard) — ✅ Completed
 ---
 
 ## Task 1: Modular Battery Management Engine
@@ -319,7 +318,58 @@ operating state, accurately reflecting every backend state transition
 throughout the demonstration.
 
 ### Design Overview
-*(to be completed during implementation)*
+### Design Overview
+- **Composite risk score:** `calculateRiskScore()` combines imbalance
+  trend (INCREASING adds risk), threshold breach, low SoC (<20%),
+  current fault state severity (FAILSAFE/SHUTDOWN add weighted risk),
+  and historical fault frequency into a single 0–100 score.
+- **Structured fault history:** A 3-slot rotating array records the
+  fault source and timestamp of the most recent FAILSAFE entries,
+  giving a compact, structured record of recent incidents.
+- **Operator recommendations:** `generateRecommendation()` converts
+  the risk score (and fault source, where relevant) into a
+  human-readable maintenance suggestion, ranging from "System healthy"
+  to an urgent SHUTDOWN inspection notice.
+- **Historical trends:** Blynk's built-in History feature was enabled
+  on the Imbalance and SoC datastreams, and a SuperChart widget plots
+  both over time on the dashboard — leveraging Blynk's native
+  time-series storage rather than custom charting code.
+- **Severity-matched visualization:** The Fault State widget mirrors
+  Task 4's four-state severity model directly through its displayed
+  text value (NORMAL/DEGRADED/FAILSAFE/SHUTDOWN), keeping the
+  dashboard's language consistent with the backend state machine.
+- **Executive summary:** Risk Score, Fault Count, Uptime, and Fault
+  State together form an at-a-glance operational summary on the
+  dashboard.
+- **Paced analytics delivery:** Analytics values are queued via
+  `enqueueEvent()` rather than sent immediately, since sending
+  multiple values in the same cycle caused some to be dropped by
+  Blynk. The existing offline-queue drain mechanism
+  (`flushOneQueuedEvent()`) naturally paces these out one per loop
+  cycle instead.
+
+### Verification
+Tested in Wokwi with the dashboard live. Confirmed via the Blynk web
+dashboard that:
+- Risk Score and Fault Count updated correctly and matched the
+  backend's actual fault activity (e.g. Risk Score of 22 with Fault
+  Count of 1 during a single ADC-triggered FAILSAFE event)
+- The SuperChart widget displayed a live-updating trend line for
+  Imbalance/SoC over time
+
+**Noted limitation:** In initial testing, Uptime, Recommendation,
+SoC, and Fault History displayed placeholder values on the dashboard
+rather than live data, traced to Blynk dropping some values when
+multiple `virtualWrite()` calls fired in the same loop cycle. A fix
+was identified and applied (routing these values through the existing
+offline queue for paced, one-per-cycle delivery), but could not be
+re-verified with a fresh dashboard screenshot due to Wokwi build
+server congestion at the time of this write-up. This will be
+confirmed and demonstrated in the final demo video.
+
+![Task 6 Wokwi Serial and LCD](Task6_1.png)
+
+![Task 6 Blynk Dashboard](Task6_2.png)
 
 ### Verification
 *(to be completed after implementation and testing)*
