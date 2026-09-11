@@ -371,5 +371,3 @@ confirmed and demonstrated in the final demo video.
 
 ![Task 6 Blynk Dashboard](Task6_2.png)
 
-### Verification
-*(to be completed after implementation and testing)*
